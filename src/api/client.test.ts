@@ -11,9 +11,9 @@ describe('api client', () => {
       new Response(JSON.stringify({ userId: 'u1' }), { headers: { 'Content-Type': 'application/json' } }),
     )
     const client = createApiClient('https://edge.example.test')
-    await client.GET('/api/whoami', { fetch: fetchMock })
+    await client.GET('/api/v1/whoami', { fetch: fetchMock })
     const request = fetchMock.mock.calls[0][0] as Request
-    expect(request.url).toBe('https://edge.example.test/api/whoami')
+    expect(request.url).toBe('https://edge.example.test/api/v1/whoami')
     expect(request.headers.get('Authorization')).toBe('Bearer user-token')
   })
 })

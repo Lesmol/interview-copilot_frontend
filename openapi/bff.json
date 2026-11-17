@@ -1,15 +1,102 @@
 {
   "openapi" : "3.1.0",
   "info" : {
-    "title" : "OpenAPI definition",
-    "version" : "v0"
+    "title" : "Interview Co-Pilot BFF API",
+    "version" : "1.0.0"
   },
   "servers" : [ {
     "url" : "http://localhost",
     "description" : "Generated server url"
   } ],
   "paths" : {
-    "/api/whoami" : {
+    "/api/v1/accounts/sign-up" : {
+      "post" : {
+        "tags" : [ "accounts-controller" ],
+        "operationId" : "signUp",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/SignUpRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "201" : {
+            "description" : "Account created",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "string",
+                  "format" : "byte"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/accounts/password-reset/request" : {
+      "post" : {
+        "tags" : [ "accounts-controller" ],
+        "operationId" : "requestReset",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/PasswordResetRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "202" : {
+            "description" : "Accepted; the response never reveals whether the email has an account",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "string",
+                  "format" : "byte"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/accounts/password-reset/confirm" : {
+      "post" : {
+        "tags" : [ "accounts-controller" ],
+        "operationId" : "confirmReset",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/PasswordResetConfirmation"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "204" : {
+            "description" : "Password changed",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "string",
+                  "format" : "byte"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/whoami" : {
       "get" : {
         "tags" : [ "whoami-controller" ],
         "operationId" : "whoami",
@@ -27,7 +114,7 @@
         }
       }
     },
-    "/api/stt-token" : {
+    "/api/v1/stt-token" : {
       "get" : {
         "tags" : [ "speech-token-controller" ],
         "operationId" : "token",
@@ -57,6 +144,56 @@
   },
   "components" : {
     "schemas" : {
+      "SignUpRequest" : {
+        "type" : "object",
+        "properties" : {
+          "email" : {
+            "type" : "string",
+            "format" : "email",
+            "maxLength" : 254,
+            "minLength" : 0
+          },
+          "name" : {
+            "type" : "string",
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "password" : {
+            "type" : "string",
+            "maxLength" : 128,
+            "minLength" : 10
+          }
+        },
+        "required" : [ "email", "name", "password" ]
+      },
+      "PasswordResetRequest" : {
+        "type" : "object",
+        "properties" : {
+          "email" : {
+            "type" : "string",
+            "format" : "email",
+            "maxLength" : 254,
+            "minLength" : 0
+          }
+        },
+        "required" : [ "email" ]
+      },
+      "PasswordResetConfirmation" : {
+        "type" : "object",
+        "properties" : {
+          "token" : {
+            "type" : "string",
+            "maxLength" : 200,
+            "minLength" : 0
+          },
+          "newPassword" : {
+            "type" : "string",
+            "maxLength" : 128,
+            "minLength" : 10
+          }
+        },
+        "required" : [ "newPassword", "token" ]
+      },
       "WhoamiResponse" : {
         "type" : "object",
         "properties" : {

@@ -1,7 +1,8 @@
 import { useState, type FormEvent } from 'react'
+import AuthLayout, { Field } from '@/auth/AuthLayout'
 import { SignInError, signIn } from '@/auth/auth'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import { Link } from '@/routing'
 
 export default function SignInPage() {
   const [username, setUsername] = useState('')
@@ -24,42 +25,15 @@ export default function SignInPage() {
   }
 
   return (
-    <main className="mx-auto grid min-h-screen max-w-md content-center gap-8 px-4">
-      <header className="space-y-3">
-        <p className="text-sm tracking-widest text-primary uppercase">Interview Co-Pilot</p>
-        <h1 className="font-serif text-4xl leading-tight">Follow-ups, while the story is still talking.</h1>
-        <p className="text-muted-foreground">Sign in to record an interview and keep your transcripts.</p>
-      </header>
-
+    <AuthLayout
+      title="Follow-ups, while the story is still talking."
+      intro="Sign in to record an interview and keep your transcripts."
+    >
       <form onSubmit={(e) => void submit(e)} className="space-y-4 rounded-lg border bg-card p-6" aria-label="Sign in">
-        <div className="space-y-1.5">
-          <label htmlFor="username" className="text-sm font-medium">
-            Email or username
-          </label>
-          <Input
-            id="username"
-            name="username"
-            autoComplete="username"
-            required
-            autoFocus
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
-        </div>
-        <div className="space-y-1.5">
-          <label htmlFor="password" className="text-sm font-medium">
-            Password
-          </label>
-          <Input
-            id="password"
-            name="password"
-            type="password"
-            autoComplete="current-password"
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </div>
+        <Field label="Email or username" name="username" autoComplete="username" required autoFocus
+          value={username} onChange={(e) => setUsername(e.target.value)} />
+        <Field label="Password" name="password" type="password" autoComplete="current-password" required
+          value={password} onChange={(e) => setPassword(e.target.value)} />
         {error && (
           <p role="alert" className="text-sm text-destructive">
             {error}
@@ -68,7 +42,15 @@ export default function SignInPage() {
         <Button type="submit" className="w-full" disabled={busy || !username || !password}>
           {busy ? 'Signing in…' : 'Sign in'}
         </Button>
+        <div className="flex justify-between text-sm">
+          <Link to="/forgot-password" className="text-primary underline-offset-4 hover:underline">
+            Forgot your password?
+          </Link>
+          <Link to="/sign-up" className="text-primary underline-offset-4 hover:underline">
+            Create an account
+          </Link>
+        </div>
       </form>
-    </main>
+    </AuthLayout>
   )
 }

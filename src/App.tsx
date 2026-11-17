@@ -1,9 +1,13 @@
 import { useEffect, useState } from 'react'
 import { createApiClient } from '@/api/client'
 import { isSignedIn, onSessionChange, signOut } from '@/auth/auth'
+import ForgotPasswordPage from '@/auth/ForgotPasswordPage'
+import ResetPasswordPage from '@/auth/ResetPasswordPage'
 import SignInPage from '@/auth/SignInPage'
+import SignUpPage from '@/auth/SignUpPage'
 import { Button } from '@/components/ui/button'
 import LiveScreen from '@/live/LiveScreen'
+import { usePath } from '@/routing'
 
 type Profile = { status: 'loading' } | { status: 'ready'; userId: string } | { status: 'error'; message: string }
 
@@ -13,7 +17,7 @@ function Home() {
   useEffect(() => {
     let cancelled = false
     createApiClient()
-      .GET('/api/whoami')
+      .GET('/api/v1/whoami')
       .then(({ data, response }) => {
         if (cancelled) return
         if (data?.userId) setProfile({ status: 'ready', userId: data.userId })
@@ -54,6 +58,17 @@ function Home() {
 
 export default function App() {
   const [signedIn, setSignedIn] = useState(isSignedIn())
+  const path = usePath()
   useEffect(() => onSessionChange(setSignedIn), [])
-  return signedIn ? <Home /> : <SignInPage />
+  if (signedIn) return <Home />
+  switch (path) {
+    case '/sign-up':
+      return <SignUpPage />
+    case '/forgot-password':
+      return <ForgotPasswordPage />
+    case '/reset-password':
+      return <ResetPasswordPage />
+    default:
+      return <SignInPage />
+  }
 }

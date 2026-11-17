@@ -39,7 +39,7 @@ export function useLiveTranscript(createAdapter: () => SpeechAdapter = () => new
     setLines([])
     setStatus('connecting')
     try {
-      const { data, error: apiError } = await createApiClient().GET('/api/stt-token', {
+      const { data, error: apiError } = await createApiClient().GET('/api/v1/stt-token', {
         params: { query: { provider: 'deepgram' } },
       })
       if (!data?.token) throw new Error(`Could not get a speech token ${JSON.stringify(apiError ?? '')}`)
