@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { createApiClient } from '@/api/client'
 import { completeSignInIfRedirected, signIn, signOut } from '@/auth/auth'
 import { Button } from '@/components/ui/button'
+import LiveScreen from '@/live/LiveScreen'
 
 type State =
   | { status: 'loading' }
@@ -33,7 +34,7 @@ export default function App() {
   }, [])
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-xl flex-col justify-center gap-6 px-4">
+    <main className="mx-auto flex min-h-screen max-w-3xl flex-col gap-6 px-4 py-8">
       <header>
         <p className="text-sm tracking-widest text-primary uppercase">Interview Co-Pilot</p>
         <h1 className="font-serif text-4xl">Follow-ups, while the story is still talking.</h1>
@@ -48,16 +49,17 @@ export default function App() {
       )}
 
       {state.status === 'signed-in' && (
-        <section className="flex flex-col gap-3 rounded-lg border bg-card p-4">
-          <p>
-            Signed in as <code data-testid="user-id">{state.userId}</code>
-          </p>
-          <div>
-            <Button variant="secondary" onClick={() => void signOut()}>
+        <>
+          <div className="flex items-center justify-between gap-3 text-sm text-muted-foreground">
+            <p>
+              Signed in as <code data-testid="user-id">{state.userId}</code>
+            </p>
+            <Button variant="ghost" size="sm" onClick={() => void signOut()}>
               Sign out
             </Button>
           </div>
-        </section>
+          <LiveScreen />
+        </>
       )}
 
       {state.status === 'error' && (

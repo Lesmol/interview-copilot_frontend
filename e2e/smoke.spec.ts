@@ -1,10 +1,26 @@
-import { expect, test } from '@playwright/test'
+import { expect, test, type Page } from '@playwright/test'
 
-test('signs in through Keycloak and reaches the backend whoami', async ({ page }) => {
+async function signIn(page: Page) {
   await page.goto('/')
   await page.getByRole('button', { name: 'Sign in' }).click()
   await page.locator('#username').fill(process.env.E2E_USER ?? 'journalist')
   await page.locator('#password').fill(process.env.E2E_PASSWORD ?? '')
   await page.locator('#kc-login').click()
   await expect(page.getByTestId('user-id')).toBeVisible()
+}
+
+test('signs in through Keycloak and reaches the backend whoami', async ({ page }) => {
+  await signIn(page)
+})
+
+test('live transcript: spoken audio becomes partial and final text', async ({ page }) => {
+  test.skip(!process.env.E2E_AUDIO, 'set E2E_AUDIO to a WAV file to run this test')
+  const timings: string[] = []
+  page.on('console', (m) => m.text().startsWith('[timing]') && timings.push(m.text()))
+  await signIn(page)
+  await page.getByRole('button', { name: 'Start live transcript' }).click()
+  await expect(page.getByText('Listening')).toBeVisible({ timeout: 20_000 })
+  await expect(page.getByTestId('transcript')).toContainText(/housing/i, { timeout: 30_000 })
+  await page.getByRole('button', { name: 'Stop' }).click()
+  console.log(timings.join('\n'))
 })
