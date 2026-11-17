@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Set up the interview</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap">
+<style>
+body{margin:0;background:#111315}
+button,input,select,textarea{font-family:inherit}
+.btn:hover{background:#23272B}
+.btn:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,a:focus-visible{outline:2px solid #E8A33D;outline-offset:2px}
+</style>
+</helmet>
+<div style="background: #111315; color: #EDEBE6; font-family: Inter, system-ui, sans-serif; min-height: 1180px; padding: 56px 24px; box-sizing: border-box">
+<div style="max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 32px">
+
+<div>
+<p style="margin: 0 0 8px; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #E8A33D">New interview</p>
+<h1 style="margin: 0 0 8px; font-family: Newsreader, Georgia, serif; font-size: 40px; line-height: 1.15; font-weight: 500">Tell the co-pilot what the story is</h1>
+<p style="margin: 0; font-size: 16px; line-height: 1.5; color: #A7ADB4">The more it knows about your angle, the better it can tell a vague answer from a useful one.</p>
+</div>
+
+<section aria-label="Details" style="display: flex; flex-direction: column; gap: 16px; padding: 24px; border-radius: 12px; border: 1px solid #23272B; background: #15181B">
+<h2 style="margin: 0; font-size: 16px; font-weight: 600">Details</h2>
+<div style="display: flex; flex-wrap: wrap; gap: 16px">
+<div style="flex: 1 1 280px; display: flex; flex-direction: column; gap: 8px">
+<label for="title" style="font-size: 13px; font-weight: 500; color: #C9CDD2">Working title</label>
+<input id="title" type="text" value="Eastgate housing project" style="min-height: 44px; box-sizing: border-box; padding: 0 16px; border-radius: 8px; border: 1px solid #2F353A; background: #111315; color: #EDEBE6; font-size: 15px">
+</div>
+<div style="flex: 1 1 280px; display: flex; flex-direction: column; gap: 8px">
+<label for="who" style="font-size: 13px; font-weight: 500; color: #C9CDD2">Interviewee</label>
+<input id="who" type="text" value="Dana Okafor, Housing Director" style="min-height: 44px; box-sizing: border-box; padding: 0 16px; border-radius: 8px; border: 1px solid #2F353A; background: #111315; color: #EDEBE6; font-size: 15px">
+</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<p style="margin: 0; font-size: 13px; font-weight: 500; color: #C9CDD2">Where is the interview?</p>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<sc-for list="{{wheres}}" as="w" hint-placeholder-count="2">
+<button class="btn" aria-pressed="{{w.on}}" onClick="{{w.pick}}" style="min-height: 44px; padding: 0 20px; border-radius: 999px; border: 1px solid {{w.border}}; background: {{w.bg}}; color: {{w.color}}; font-size: 14px; font-weight: 500; cursor: pointer">{{w.label}}</button>
+</sc-for>
+</div>
+<p style="margin: 0; font-size: 13px; line-height: 1.5; color: #A7ADB4">{{whereHint}}</p>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<label for="angle"style="font-size: 13px; font-weight: 500; color: #C9CDD2">Your angle</label>
+<textarea id="angle" rows="3" style="box-sizing: border-box; padding: 12px 16px; border-radius: 8px; border: 1px solid #2F353A; background: #111315; color: #EDEBE6; font-size: 15px; line-height: 1.5; resize: vertical">Why the Eastgate housing project is behind schedule, and who knew what, when.</textarea>
+</div>
+</section>
+
+<section aria-label="Questions to cover" style="display: flex; flex-direction: column; gap: 16px; padding: 24px; border-radius: 12px; border: 1px solid #23272B; background: #15181B">
+<div>
+<h2 style="margin: 0 0 4px; font-size: 16px; font-weight: 600">Questions to cover</h2>
+<p style="margin: 0; font-size: 13px; line-height: 1.5; color: #A7ADB4">They stay beside the transcript, and the co-pilot marks which ones you have covered.</p>
+</div>
+<div style="display: flex; flex-direction: column; border: 1px solid #23272B; border-radius: 8px; padding: 0 16px; background: #111315">
+<p style="margin: 0; padding: 12px 0; font-size: 15px; border-bottom: 1px solid #1F2326">Timeline of the delay</p>
+<p style="margin: 0; padding: 12px 0; font-size: 15px; border-bottom: 1px solid #1F2326">When the council was told</p>
+<p style="margin: 0; padding: 12px 0; font-size: 15px; border-bottom: 1px solid #1F2326">Contractor change</p>
+<p style="margin: 0; padding: 12px 0; font-size: 15px; border-bottom: 1px solid #1F2326">Budget revisions</p>
+<p style="margin: 0; padding: 12px 0; font-size: 15px">Impact on residents</p>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 12px">
+<label for="addq" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Add a question</label>
+<input id="addq" type="text" placeholder="Add a question or topic" style="flex: 1 1 240px; min-height: 44px; box-sizing: border-box; padding: 0 16px; border-radius: 8px; border: 1px solid #2F353A; background: #111315; color: #EDEBE6; font-size: 15px">
+<button class="btn" style="min-height: 44px; padding: 0 20px; border-radius: 8px; border: 1px solid #3A4046; background: transparent; color: #EDEBE6; font-size: 14px; font-weight: 500; cursor: pointer">Add</button>
+</div>
+</section>
+
+<section aria-label="Suggestions" style="display: flex; flex-direction: column; gap: 16px; padding: 24px; border-radius: 12px; border: 1px solid #23272B; background: #15181B">
+<div>
+<h2 style="margin: 0 0 4px; font-size: 16px; font-weight: 600">What should it watch for?</h2>
+<p style="margin: 0; font-size: 13px; line-height: 1.5; color: #A7ADB4">Turn off anything that would pull your attention away from the person in front of you.</p>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 12px">
+<sc-for list="{{kinds}}" as="k" hint-placeholder-count="4">
+<button class="btn" aria-pressed="{{k.on}}" onClick="{{k.toggle}}" style="flex: 1 1 280px; min-height: 64px; box-sizing: border-box; padding: 12px 16px; border-radius: 8px; border: 1px solid {{k.border}}; background: {{k.bg}}; color: #EDEBE6; text-align: left; display: flex; align-items: center; justify-content: space-between; gap: 12px; cursor: pointer">
+<span style="display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 15px; font-weight: 500">{{k.label}}</span>
+<span style="font-size: 13px; color: #A7ADB4">{{k.desc}}</span>
+</span>
+<span style="font-size: 12px; font-weight: 600; color: {{k.stateColor}}">{{k.stateText}}</span>
+</button>
+</sc-for>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<p style="margin: 0; font-size: 13px; font-weight: 500; color: #C9CDD2">How often should it speak up?</p>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<sc-for list="{{freqs}}" as="f" hint-placeholder-count="3">
+<button class="btn" aria-pressed="{{f.on}}" onClick="{{f.pick}}" style="min-height: 44px; padding: 0 20px; border-radius: 999px; border: 1px solid {{f.border}}; background: {{f.bg}}; color: {{f.color}}; font-size: 14px; font-weight: 500; cursor: pointer">{{f.label}}</button>
+</sc-for>
+</div>
+</div>
+</section>
+
+<section aria-label="Audio and privacy" style="display: flex; flex-direction: column; gap: 16px; padding: 24px; border-radius: 12px; border: 1px solid #23272B; background: #15181B">
+<h2 style="margin: 0; font-size: 16px; font-weight: 600">Audio and privacy</h2>
+<div style="display: flex; flex-wrap: wrap; align-items: flex-end; gap: 16px">
+<div style="flex: 1 1 280px; display: flex; flex-direction: column; gap: 8px">
+<label for="mic" style="font-size: 13px; font-weight: 500; color: #C9CDD2">Microphone</label>
+<select id="mic" style="min-height: 44px; box-sizing: border-box; padding: 0 12px; border-radius: 8px; border: 1px solid #2F353A; background: #111315; color: #EDEBE6; font-size: 15px">
+<option>Built-in microphone</option>
+<option>External USB microphone</option>
+</select>
+</div>
+<span style="display: inline-flex; align-items: center; gap: 8px; min-height: 44px; font-size: 13px; color: #A7ADB4">
+<svg aria-hidden="true" width="20" height="16" viewBox="0 0 20 16" fill="#8FD6A8"><rect x="0" y="9" width="3" height="7" rx="1"/><rect x="5.5" y="5" width="3" height="11" rx="1"/><rect x="11" y="2" width="3" height="14" rx="1"/><rect x="16.5" y="7" width="3" height="9" rx="1" fill="#3A4046"/></svg>
+Mic check: say a sentence so the co-pilot learns your voice
+</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<p style="margin: 0; font-size: 15px; line-height: 1.5; color: #EDEBE6">Transcripts are saved to your account</p>
+<p style="margin: 0; font-size: 13px; line-height: 1.5; color: #A7ADB4">Kept in your account until you delete the interview.</p>
+</div>
+<label style="display: flex; align-items: flex-start; gap: 12px; font-size: 15px; line-height: 1.5; color: #EDEBE6; cursor: pointer">
+<input type="checkbox" checked="{{consent}}" onChange="{{toggleConsent}}" style="width: 20px; height: 20px; margin: 2px 0 0; accent-color: #E8A33D; flex: none">
+<span>The interviewee knows they are being recorded and transcribed<br><span style="font-size: 13px; color: #A7ADB4">Required before you can start.</span></span>
+</label>
+</section>
+
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 16px">
+<sc-if value="{{consent}}" hint-placeholder-val="{{false}}">
+<a href="Main.dc.html" style="display: inline-flex; align-items: center; justify-content: center; min-height: 52px; padding: 0 32px; border-radius: 8px; background: #E8A33D; color: #111315; font-size: 16px; font-weight: 600; text-decoration: none">Start interview</a>
+</sc-if>
+<sc-if value="{{noConsent}}" hint-placeholder-val="{{true}}">
+<button disabled style="min-height: 52px; padding: 0 32px; border-radius: 8px; border: 1px solid #2F353A; background: #1B1F22; color: #8B929A; font-size: 16px; font-weight: 600; cursor: not-allowed">Start interview</button>
+<span style="font-size: 13px; color: #A7ADB4">Confirm consent above to start.</span>
+</sc-if>
+</div>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1180}}'>
+class Component extends DCLogic {
+renderVals() {
+const st = this.state || {};
+const off = st.off || [];
+const freq = st.freq || 'Balanced';
+const consent = !!st.consent;
+const kinds = [
+{ key: 'follow', label: 'Follow-up questions', desc: 'Natural next questions' },
+{ key: 'vague', label: 'Vague answers', desc: 'Hedging and generalities' },
+{ key: 'contra', label: 'Contradictions', desc: 'Conflicts with earlier answers' },
+{ key: 'aside', label: 'Skipped asides', desc: 'Threads the speaker dropped' }
+].map((k) => {
+const on = !off.includes(k.key);
+return {
+...k,
+on,
+border: on ? '#E8A33D' : '#2F353A',
+bg: on ? '#1C1B18' : '#111315',
+stateText: on ? 'On' : 'Off',
+stateColor: on ? '#E8A33D' : '#8B929A',
+toggle: () => this.setState({ off: on ? off.concat([k.key]) : off.filter((x) => x !== k.key) })
+};
+});
+const freqs = ['Calm', 'Balanced', 'Active'].map((label) => {
+const on = freq === label;
+return {
+label,
+on,
+border: on ? '#E8A33D' : '#2F353A',
+bg: on ? '#E8A33D' : 'transparent',
+color: on ? '#111315' : '#EDEBE6',
+pick: () => this.setState({ freq: label })
+};
+});
+const where = st.where || 'In person';
+const wheres = ['In person', 'Remote call'].map((label) => {
+const on = where === label;
+return {
+label,
+on,
+border: on ? '#E8A33D' : '#2F353A',
+bg: on ? '#E8A33D' : 'transparent',
+color: on ? '#111315' : '#EDEBE6',
+pick: () => this.setState({ where: label })
+};
+});
+const whereHint = where === 'In person'
+? 'One microphone picks up both voices. The co-pilot separates the speakers and labels you from the mic check.'
+: 'Your microphone and the call audio are captured separately, so each voice gets its own label.';
+return { kinds, freqs, wheres, whereHint, consent, noConsent: !consent, toggleConsent: () => this.setState({ consent: !consent }) };
+}
+}
+</script>
+</body>
+</html>

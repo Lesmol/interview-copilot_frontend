@@ -1,0 +1,25 @@
+server {
+    listen 8080;
+    root /usr/share/nginx/html;
+    index index.html;
+
+    location = /config.js {
+        add_header Cache-Control "no-store";
+    }
+
+    # Same-origin API: the browser only ever talks to the edge gateway through here.
+    location /api/ {
+        proxy_pass ${EDGE_GATEWAY_URL};
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header Connection "";
+        # Suggestion stream (SSE) must not be buffered.
+        proxy_buffering off;
+        proxy_cache off;
+        proxy_read_timeout 1h;
+    }
+
+    location / {
+        try_files $uri /index.html;
+    }
+}
