@@ -1,33 +1,27 @@
 import { useEffect, useState } from 'react'
 import { createApiClient } from '@/api/client'
-import { completeSignInIfRedirected, signIn, signOut } from '@/auth/auth'
+import { isSignedIn, onSessionChange, signOut } from '@/auth/auth'
+import SignInPage from '@/auth/SignInPage'
 import { Button } from '@/components/ui/button'
 import LiveScreen from '@/live/LiveScreen'
 
-type State =
-  | { status: 'loading' }
-  | { status: 'signed-out' }
-  | { status: 'signed-in'; userId: string }
-  | { status: 'error'; message: string }
+type Profile = { status: 'loading' } | { status: 'ready'; userId: string } | { status: 'error'; message: string }
 
-export default function App() {
-  const [state, setState] = useState<State>({ status: 'loading' })
+function Home() {
+  const [profile, setProfile] = useState<Profile>({ status: 'loading' })
 
   useEffect(() => {
     let cancelled = false
-    async function init() {
-      try {
-        const user = await completeSignInIfRedirected()
-        if (!user) return setState({ status: 'signed-out' })
-        const { data, error, response } = await createApiClient().GET('/api/whoami')
+    createApiClient()
+      .GET('/api/whoami')
+      .then(({ data, response }) => {
         if (cancelled) return
-        if (data?.userId) setState({ status: 'signed-in', userId: data.userId })
-        else setState({ status: 'error', message: `whoami failed (${response.status}) ${JSON.stringify(error ?? '')}` })
-      } catch (e) {
-        if (!cancelled) setState({ status: 'error', message: e instanceof Error ? e.message : String(e) })
-      }
-    }
-    void init()
+        if (data?.userId) setProfile({ status: 'ready', userId: data.userId })
+        else setProfile({ status: 'error', message: `Could not load your account (${response.status}).` })
+      })
+      .catch((e: unknown) => {
+        if (!cancelled) setProfile({ status: 'error', message: e instanceof Error ? e.message : String(e) })
+      })
     return () => {
       cancelled = true
     }
@@ -35,38 +29,31 @@ export default function App() {
 
   return (
     <main className="mx-auto flex min-h-screen max-w-3xl flex-col gap-6 px-4 py-8">
-      <header>
+      <header className="flex items-center justify-between gap-3">
         <p className="text-sm tracking-widest text-primary uppercase">Interview Co-Pilot</p>
-        <h1 className="font-serif text-4xl">Follow-ups, while the story is still talking.</h1>
-      </header>
-
-      {state.status === 'loading' && <p className="text-muted-foreground">Loading…</p>}
-
-      {state.status === 'signed-out' && (
-        <div>
-          <Button onClick={() => void signIn()}>Sign in</Button>
+        <div className="flex items-center gap-3 text-sm text-muted-foreground">
+          {profile.status === 'ready' && (
+            <span>
+              Signed in as <code data-testid="user-id">{profile.userId}</code>
+            </span>
+          )}
+          <Button variant="ghost" size="sm" onClick={() => void signOut()}>
+            Sign out
+          </Button>
         </div>
-      )}
-
-      {state.status === 'signed-in' && (
-        <>
-          <div className="flex items-center justify-between gap-3 text-sm text-muted-foreground">
-            <p>
-              Signed in as <code data-testid="user-id">{state.userId}</code>
-            </p>
-            <Button variant="ghost" size="sm" onClick={() => void signOut()}>
-              Sign out
-            </Button>
-          </div>
-          <LiveScreen />
-        </>
-      )}
-
-      {state.status === 'error' && (
+      </header>
+      {profile.status === 'error' && (
         <p role="alert" className="text-destructive">
-          {state.message}
+          {profile.message}
         </p>
       )}
+      <LiveScreen />
     </main>
   )
+}
+
+export default function App() {
+  const [signedIn, setSignedIn] = useState(isSignedIn())
+  useEffect(() => onSessionChange(setSignedIn), [])
+  return signedIn ? <Home /> : <SignInPage />
 }

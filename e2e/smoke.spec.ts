@@ -2,14 +2,13 @@ import { expect, test, type Page } from '@playwright/test'
 
 async function signIn(page: Page) {
   await page.goto('/')
+  await page.getByLabel('Email or username').fill(process.env.E2E_USER ?? 'journalist')
+  await page.getByLabel('Password').fill(process.env.E2E_PASSWORD ?? '')
   await page.getByRole('button', { name: 'Sign in' }).click()
-  await page.locator('#username').fill(process.env.E2E_USER ?? 'journalist')
-  await page.locator('#password').fill(process.env.E2E_PASSWORD ?? '')
-  await page.locator('#kc-login').click()
   await expect(page.getByTestId('user-id')).toBeVisible()
 }
 
-test('signs in through Keycloak and reaches the backend whoami', async ({ page }) => {
+test('signs in on our own page and reaches the backend whoami', async ({ page }) => {
   await signIn(page)
 })
 
