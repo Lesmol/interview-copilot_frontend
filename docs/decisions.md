@@ -14,3 +14,4 @@
 - **The proxy keeps the port in `Host`** (`$http_host`): without it the edge gateway saw browser POSTs as cross-origin and answered 403.
 - **API versioning:** the generated client only accepts `/api/v1/...` paths.
 - **AssemblyAI skipped.** The adapter interface stays provider-agnostic; only Deepgram is implemented.
+- **Suggestion rail (milestone 4).** New cards are appended below the existing ones and never reorder, because the brief says a new suggestion must not shift existing cards; the design mock puts the newest on top. Pinning marks a card but does not move it, for the same reason. Asked and dismissed cards leave the rail (they return in Review, milestone 7). The stream is read with `fetch` rather than `EventSource`, which cannot send the bearer token; on a dropped connection it reconnects with back-off and re-reads the list so nothing is lost. Speaker labels arrive in milestone 5, so lines are posted without a speaker for now.

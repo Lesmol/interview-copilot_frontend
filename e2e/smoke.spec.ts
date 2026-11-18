@@ -20,6 +20,14 @@ test('live transcript: spoken audio becomes partial and final text', async ({ pa
   await page.getByRole('button', { name: 'Start live transcript' }).click()
   await expect(page.getByText('Listening')).toBeVisible({ timeout: 20_000 })
   await expect(page.getByTestId('transcript')).toContainText(/housing/i, { timeout: 30_000 })
+
+  // The final line is posted to the backend and a suggestion comes back into the rail.
+  const card = page.getByTestId('suggestion').first()
+  await expect(card).toBeVisible({ timeout: 15_000 })
+  await card.getByRole('button', { name: 'Pin suggestion' }).click()
+  await expect(card.getByText('Pinned')).toBeVisible()
+  await card.getByRole('button', { name: 'Asked' }).click()
+  await expect(page.getByTestId('suggestion-count')).toContainText('1 asked')
   await page.getByRole('button', { name: 'Stop' }).click()
   console.log(timings.join('\n'))
 })

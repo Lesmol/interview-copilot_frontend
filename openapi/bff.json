@@ -9,6 +9,91 @@
     "description" : "Generated server url"
   } ],
   "paths" : {
+    "/api/v1/sessions" : {
+      "post" : {
+        "tags" : [ "live-controller" ],
+        "operationId" : "createSession",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CreateSessionRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "201" : {
+            "description" : "Created",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/SessionResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/sessions/{id}/utterances" : {
+      "post" : {
+        "tags" : [ "live-controller" ],
+        "operationId" : "addUtterance",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/UtteranceRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "201" : {
+            "description" : "Created",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/UtteranceResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/sessions/{id}/end" : {
+      "post" : {
+        "tags" : [ "live-controller" ],
+        "operationId" : "endSession",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          }
+        }
+      }
+    },
     "/api/v1/accounts/sign-up" : {
       "post" : {
         "tags" : [ "accounts-controller" ],
@@ -96,6 +181,43 @@
         }
       }
     },
+    "/api/v1/suggestions/{id}" : {
+      "patch" : {
+        "tags" : [ "live-controller" ],
+        "operationId" : "updateSuggestion",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/SuggestionStatusRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/SuggestionResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/whoami" : {
       "get" : {
         "tags" : [ "whoami-controller" ],
@@ -140,10 +262,195 @@
           }
         }
       }
+    },
+    "/api/v1/sessions/{id}/suggestions" : {
+      "get" : {
+        "tags" : [ "live-controller" ],
+        "operationId" : "suggestions",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/SuggestionResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/sessions/{id}/suggestions/stream" : {
+      "get" : {
+        "tags" : [ "live-controller" ],
+        "operationId" : "stream",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Server-sent events; one `suggestion` event per new suggestion",
+            "content" : {
+              "text/event-stream" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/SuggestionResponse"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components" : {
     "schemas" : {
+      "CreateSessionRequest" : {
+        "type" : "object",
+        "properties" : {
+          "title" : {
+            "type" : "string",
+            "maxLength" : 200,
+            "minLength" : 0
+          },
+          "interviewee" : {
+            "type" : "string",
+            "maxLength" : 200,
+            "minLength" : 0
+          },
+          "angle" : {
+            "type" : "string",
+            "maxLength" : 2000,
+            "minLength" : 0
+          },
+          "interviewType" : {
+            "type" : "string"
+          },
+          "suggestionTypes" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            },
+            "uniqueItems" : true
+          },
+          "frequency" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "title" ]
+      },
+      "SessionResponse" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "title" : {
+            "type" : "string"
+          },
+          "interviewee" : {
+            "type" : "string"
+          },
+          "angle" : {
+            "type" : "string"
+          },
+          "interviewType" : {
+            "type" : "string"
+          },
+          "suggestionTypes" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            },
+            "uniqueItems" : true
+          },
+          "frequency" : {
+            "type" : "string"
+          },
+          "startedAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "endedAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          }
+        },
+        "required" : [ "frequency", "id", "interviewType", "startedAt", "suggestionTypes", "title" ]
+      },
+      "UtteranceRequest" : {
+        "type" : "object",
+        "properties" : {
+          "text" : {
+            "type" : "string",
+            "maxLength" : 5000,
+            "minLength" : 0
+          },
+          "speaker" : {
+            "type" : "string",
+            "maxLength" : 100,
+            "minLength" : 0
+          },
+          "startMs" : {
+            "type" : "integer",
+            "format" : "int64",
+            "minimum" : 0
+          },
+          "endMs" : {
+            "type" : "integer",
+            "format" : "int64",
+            "minimum" : 0
+          }
+        },
+        "required" : [ "text" ]
+      },
+      "UtteranceResponse" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "seq" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "speaker" : {
+            "type" : "string"
+          },
+          "text" : {
+            "type" : "string"
+          },
+          "startMs" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "endMs" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        },
+        "required" : [ "endMs", "id", "seq", "startMs", "text" ]
+      },
       "SignUpRequest" : {
         "type" : "object",
         "properties" : {
@@ -193,6 +500,56 @@
           }
         },
         "required" : [ "newPassword", "token" ]
+      },
+      "SuggestionStatusRequest" : {
+        "type" : "object",
+        "properties" : {
+          "status" : {
+            "type" : "string",
+            "enum" : [ "open", "asked", "dismissed", "pinned" ],
+            "minLength" : 1
+          }
+        },
+        "required" : [ "status" ]
+      },
+      "SuggestionResponse" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "sessionId" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "type" : {
+            "type" : "string",
+            "enum" : [ "follow_up", "vague", "contradiction", "aside" ]
+          },
+          "text" : {
+            "type" : "string"
+          },
+          "quote" : {
+            "type" : "string"
+          },
+          "sourceSeqs" : {
+            "type" : "array",
+            "items" : {
+              "type" : "integer",
+              "format" : "int32"
+            }
+          },
+          "status" : {
+            "type" : "string",
+            "enum" : [ "open", "asked", "dismissed", "pinned" ]
+          },
+          "createdAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          }
+        },
+        "required" : [ "createdAt", "id", "sessionId", "sourceSeqs", "status", "text", "type" ]
       },
       "WhoamiResponse" : {
         "type" : "object",

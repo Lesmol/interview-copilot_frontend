@@ -4,6 +4,54 @@
  */
 
 export interface paths {
+    "/api/v1/sessions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["createSession"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/sessions/{id}/utterances": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["addUtterance"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/sessions/{id}/end": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["endSession"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/accounts/sign-up": {
         parameters: {
             query?: never;
@@ -52,6 +100,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/suggestions/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["updateSuggestion"];
+        trace?: never;
+    };
     "/api/v1/whoami": {
         parameters: {
             query?: never;
@@ -84,10 +148,84 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/sessions/{id}/suggestions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["suggestions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/sessions/{id}/suggestions/stream": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["stream"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        CreateSessionRequest: {
+            title: string;
+            interviewee?: string;
+            angle?: string;
+            interviewType?: string;
+            suggestionTypes?: string[];
+            frequency?: string;
+        };
+        SessionResponse: {
+            /** Format: uuid */
+            id: string;
+            title: string;
+            interviewee?: string;
+            angle?: string;
+            interviewType: string;
+            suggestionTypes: string[];
+            frequency: string;
+            /** Format: date-time */
+            startedAt: string;
+            /** Format: date-time */
+            endedAt?: string;
+        };
+        UtteranceRequest: {
+            text: string;
+            speaker?: string;
+            /** Format: int64 */
+            startMs?: number;
+            /** Format: int64 */
+            endMs?: number;
+        };
+        UtteranceResponse: {
+            /** Format: uuid */
+            id: string;
+            /** Format: int32 */
+            seq: number;
+            speaker?: string;
+            text: string;
+            /** Format: int64 */
+            startMs: number;
+            /** Format: int64 */
+            endMs: number;
+        };
         SignUpRequest: {
             /** Format: email */
             email: string;
@@ -101,6 +239,25 @@ export interface components {
         PasswordResetConfirmation: {
             token: string;
             newPassword: string;
+        };
+        SuggestionStatusRequest: {
+            /** @enum {string} */
+            status: "open" | "asked" | "dismissed" | "pinned";
+        };
+        SuggestionResponse: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            sessionId: string;
+            /** @enum {string} */
+            type: "follow_up" | "vague" | "contradiction" | "aside";
+            text: string;
+            quote?: string;
+            sourceSeqs: number[];
+            /** @enum {string} */
+            status: "open" | "asked" | "dismissed" | "pinned";
+            /** Format: date-time */
+            createdAt: string;
         };
         WhoamiResponse: {
             userId?: string;
@@ -120,6 +277,76 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    createSession: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateSessionRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionResponse"];
+                };
+            };
+        };
+    };
+    addUtterance: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UtteranceRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UtteranceResponse"];
+                };
+            };
+        };
+    };
+    endSession: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     signUp: {
         parameters: {
             query?: never;
@@ -192,6 +419,32 @@ export interface operations {
             };
         };
     };
+    updateSuggestion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SuggestionStatusRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SuggestionResponse"];
+                };
+            };
+        };
+    };
     whoami: {
         parameters: {
             query?: never;
@@ -230,6 +483,50 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SpeechTokenResponse"];
+                };
+            };
+        };
+    };
+    suggestions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SuggestionResponse"][];
+                };
+            };
+        };
+    };
+    stream: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Server-sent events; one `suggestion` event per new suggestion */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/event-stream": components["schemas"]["SuggestionResponse"];
                 };
             };
         };

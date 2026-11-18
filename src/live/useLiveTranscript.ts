@@ -22,10 +22,22 @@ export function useLiveTranscript(createAdapter: () => SpeechAdapter = () => new
   const [error, setError] = useState<string>()
   const [lines, setLines] = useState<TranscriptLine[]>([])
   const [partial, setPartial] = useState('')
+  const [sessionId, setSessionId] = useState<string>()
+  const [startedAt, setStartedAt] = useState<number>()
   const adapter = useRef<SpeechAdapter | undefined>(undefined)
   const capture = useRef<MicCapture | undefined>(undefined)
+  const session = useRef<string | undefined>(undefined)
+  // Final lines are posted one after another so the server numbers them in the order they were spoken.
+  const posting = useRef<Promise<unknown>>(Promise.resolve())
 
   const stop = useCallback(() => {
+    const ending = session.current
+    if (ending) {
+      posting.current = posting.current.then(() =>
+        createApiClient().POST('/api/v1/sessions/{id}/end', { params: { path: { id: ending } } }),
+      )
+      session.current = undefined
+    }
     capture.current?.stop()
     adapter.current?.close()
     capture.current = undefined
@@ -37,9 +49,17 @@ export function useLiveTranscript(createAdapter: () => SpeechAdapter = () => new
   const start = useCallback(async () => {
     setError(undefined)
     setLines([])
+    setSessionId(undefined)
     setStatus('connecting')
     try {
-      const { data, error: apiError } = await createApiClient().GET('/api/v1/stt-token', {
+      const api = createApiClient()
+      const created = await api.POST('/api/v1/sessions', { body: { title: 'Live interview' } })
+      if (!created.data) throw new Error('Could not start a session')
+      const id = created.data.id
+      session.current = id
+      setSessionId(id)
+      setStartedAt(Date.now())
+      const { data, error: apiError } = await api.GET('/api/v1/stt-token', {
         params: { query: { provider: 'deepgram' } },
       })
       if (!data?.token) throw new Error(`Could not get a speech token ${JSON.stringify(apiError ?? '')}`)
@@ -54,6 +74,14 @@ export function useLiveTranscript(createAdapter: () => SpeechAdapter = () => new
         console.info(`[timing] speech->final text ${lagMs} ms (utterance ends at ${utterance.endMs} ms)`)
         setPartial('')
         setLines((previous) => [...previous, { id: nextId++, ...utterance }])
+        posting.current = posting.current.then(() =>
+          api
+            .POST('/api/v1/sessions/{id}/utterances', {
+              params: { path: { id } },
+              body: { text: utterance.text, startMs: utterance.startMs, endMs: utterance.endMs },
+            })
+            .catch((e: unknown) => console.warn('[utterance] could not save a line', e)),
+        )
       })
       speech.onError((message) => {
         setError(message)
@@ -76,5 +104,5 @@ export function useLiveTranscript(createAdapter: () => SpeechAdapter = () => new
 
   useEffect(() => stop, [stop])
 
-  return { status, error, lines, partial, start, stop }
+  return { status, error, lines, partial, sessionId, startedAt, start, stop }
 }
